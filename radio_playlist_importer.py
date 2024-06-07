@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import sqlite3
 import os
+from datetime import datetime, timedelta
 
 
 def create_tables(conn):
@@ -57,7 +58,7 @@ def insert_or_update_data(conn, track_data, performers_data):
             ''', (track_id, performer['role'], performer['name']))
 
 
-def parse_html(content):
+def parse_html(content, date_str):
     soup = BeautifulSoup(content, 'lxml')
     programs = soup.find_all('li', class_='program')
 
@@ -65,6 +66,7 @@ def parse_html(content):
 
     for program in programs:
         time = program.find('strong', class_='time').text.strip()
+        full_time = f"{date_str} {time}"
 
         title_element = program.find('h3')
         title_text = title_element.find('span', class_='title').text.strip()
@@ -91,7 +93,7 @@ def parse_html(content):
         detail_rows = details.find_all('div', class_='details_row')
 
         track_data = (
-        time, musical_piece, movement, artist_text if artist_element else None, full_title, image_link, None, None)
+        full_time, musical_piece, movement, artist_text if artist_element else None, full_title, image_link, None, None)
         performers_data = []
 
         for detail in detail_rows:
@@ -110,14 +112,16 @@ def parse_html(content):
     return tracks
 
 
-def main():
-    url = 'https://www.ndr.de/kultur/programm/titelliste1212.html'
-
-    # Senden einer HTTP-Anfrage an die URL
+def fetch_and_parse(url, date_str):
     response = requests.get(url)
     response.raise_for_status()  # Überprüfen, ob die Anfrage erfolgreich war
+    return parse_html(response.text, date_str)
 
-    html_content = response.text
+
+def main():
+    base_url = 'https://www.ndr.de/kultur/programm/titelliste1212.html'
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=60)
 
     # Sicherstellen, dass das .data-Verzeichnis existiert
     os.makedirs('.data', exist_ok=True)
@@ -127,10 +131,17 @@ def main():
     conn = sqlite3.connect(db_path)
     create_tables(conn)
 
-    # Parse HTML und speichere die Daten in der Datenbank
-    tracks = parse_html(html_content)
-    for track_data, performers_data in tracks:
-        insert_or_update_data(conn, track_data, performers_data)
+    # Iteriere über die letzten 60 Tage, jede Stunde
+    current_date = start_date
+    while current_date <= end_date:
+        for hour in range(24):
+            date_str = current_date.strftime('%Y-%m-%d')
+            url = f'{base_url}?date={date_str}&hour={hour}'
+            print(f'Fetching: {url}')  # Fortschritt ausgeben
+            tracks = fetch_and_parse(url, date_str)
+            for track_data, performers_data in tracks:
+                insert_or_update_data(conn, track_data, performers_data)
+        current_date += timedelta(days=1)
 
     conn.close()
 
