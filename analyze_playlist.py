@@ -5,13 +5,15 @@ import os
 def get_top_n_tracks(conn, n=10):
     cursor = conn.execute('''
     SELECT t.full_title, t.title, t.movement, t.composer, t.album, t.catalog_number, 
-           GROUP_CONCAT(p.role || ': ' || p.name, ', ') as performers, COUNT(*) as count
+           GROUP_CONCAT(p.role || ': ' || p.name, ', ') as performers, COUNT(t.id) as count
     FROM Tracks t
     LEFT JOIN Performers p ON t.id = p.track_id
-    GROUP BY t.full_title, t.title, t.movement, t.composer, t.album, t.catalog_number, performers
+    GROUP BY t.full_title, t.title, t.movement, t.composer, t.album, t.catalog_number
     ORDER BY count DESC
     LIMIT ?
     ''', (n,))
+
+
     return cursor.fetchall()
 
 
