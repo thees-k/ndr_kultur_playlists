@@ -134,7 +134,7 @@ def main():
     # Iteriere über die letzten 60 Tage, jede Stunde
     current_date = start_date
     while current_date <= end_date:
-        for hour in range(24):
+        for hour in range(6, 24):
             date_str = current_date.strftime('%Y-%m-%d')
             url = f'{base_url}?date={date_str}&hour={hour}'
             print(f'Fetching: {url}')  # Fortschritt ausgeben
