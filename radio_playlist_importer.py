@@ -1,4 +1,3 @@
-import argparse
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
@@ -112,11 +111,7 @@ def parse_html(content):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Parse an HTML file from a URL and extract radio program information.')
-    parser.add_argument('url', help='URL of the HTML file')
-
-    args = parser.parse_args()
-    url = args.url
+    url = 'https://www.ndr.de/kultur/programm/titelliste1212.html'
 
     # Senden einer HTTP-Anfrage an die URL
     response = requests.get(url)
