@@ -4,17 +4,21 @@ import os
 
 def get_top_n_tracks(conn, n=10):
     cursor = conn.execute('''
-    SELECT t.full_title, t.title, t.movement, t.composer, t.album, t.catalog_number, 
-           GROUP_CONCAT(p.role || ': ' || p.name, ', ') as performers, COUNT(t.id) as count
-    FROM Tracks t
-    LEFT JOIN Performers p ON t.id = p.track_id
-    GROUP BY t.full_title, t.title, t.movement, t.composer, t.album, t.catalog_number
+    SELECT full_title, title, movement, composer, album, catalog_number, orchestra, conductor, solist, choir, COUNT(id) as count
+    FROM Tracks
+    GROUP BY full_title, title, movement, composer, album, catalog_number, orchestra, conductor, solist, choir
     ORDER BY count DESC
     LIMIT ?
     ''', (n,))
 
+    results = cursor.fetchall()
 
-    return cursor.fetchall()
+    # Debugging: Ergebnisse auf der Konsole ausgeben
+    print("\nDebugging: Ergebnisse der SELECT-Abfrage:")
+    for row in results:
+        print(row)
+
+    return results
 
 
 def get_top_n_composers(conn, n=10):
@@ -31,11 +35,10 @@ def get_top_n_composers(conn, n=10):
 
 def get_top_n_orchestras(conn, n=10):
     cursor = conn.execute('''
-    SELECT p.name, COUNT(*) as count
-    FROM Performers p
-    JOIN Tracks t ON p.track_id = t.id
-    WHERE p.role = 'Orchester'
-    GROUP BY p.name
+    SELECT orchestra, COUNT(*) as count
+    FROM Tracks
+    WHERE orchestra IS NOT NULL
+    GROUP BY orchestra
     ORDER BY count DESC
     LIMIT ?
     ''', (n,))
@@ -44,11 +47,10 @@ def get_top_n_orchestras(conn, n=10):
 
 def get_top_n_conductors(conn, n=10):
     cursor = conn.execute('''
-    SELECT p.name, COUNT(*) as count
-    FROM Performers p
-    JOIN Tracks t ON p.track_id = t.id
-    WHERE p.role = 'Dirigent'
-    GROUP BY p.name
+    SELECT conductor, COUNT(*) as count
+    FROM Tracks
+    WHERE conductor IS NOT NULL
+    GROUP BY conductor
     ORDER BY count DESC
     LIMIT ?
     ''', (n,))
@@ -71,14 +73,17 @@ def display_results(results, title):
     print(f'\n{title}\n' + '-' * len(title))
     for i, result in enumerate(results, 1):
         if isinstance(result, tuple) and len(result) > 2:
-            full_title, title, movement, composer, album, catalog_number, performers, count = result
+            full_title, title, movement, composer, album, catalog_number, orchestra, conductor, solist, choir, count = result
             print(f"{i}. {full_title} - {count} Mal gespielt")
             print(f"   Werk: {title}")
             print(f"   Satzbezeichnung: {movement}")
             print(f"   Komponist: {composer}")
             print(f"   Album: {album}")
             print(f"   Bestellnummer: {catalog_number}")
-            print(f"   Interpreten: {performers}")
+            print(f"   Orchester/Ensemble: {orchestra}")
+            print(f"   Dirigent: {conductor}")
+            print(f"   Solist: {solist}")
+            print(f"   Chor: {choir}")
         else:
             name, count = result
             print(f"{i}. {name} - {count} Mal gespielt")
@@ -95,7 +100,7 @@ def main():
         print("\nWählen Sie eine Option:")
         print("1. Die zehn am häufigsten gespielten Titel sehen")
         print("2. Die zehn am häufigsten gespielten Komponisten sehen")
-        print("3. Die zehn am häufigsten gespielten Orchester sehen")
+        print("3. Die zehn am häufigsten gespielten Orchester/Ensembles sehen")
         print("4. Die zehn am häufigsten gespielten Dirigenten sehen")
         print("5. Die zehn am häufigsten gespielten Alben sehen")
         print("6. Beenden")
@@ -110,7 +115,7 @@ def main():
             display_results(results, "Die zehn am häufigsten gespielten Komponisten")
         elif choice == '3':
             results = get_top_n_orchestras(conn)
-            display_results(results, "Die zehn am häufigsten gespielten Orchester")
+            display_results(results, "Die zehn am häufigsten gespielten Orchester/Ensembles")
         elif choice == '4':
             results = get_top_n_conductors(conn)
             display_results(results, "Die zehn am häufigsten gespielten Dirigenten")
