@@ -2,6 +2,7 @@ import argparse
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
+import os
 
 
 def create_tables(conn):
@@ -151,8 +152,12 @@ def main():
 
     html_content = response.text
 
+    # Sicherstellen, dass das .data-Verzeichnis existiert
+    os.makedirs('.data', exist_ok=True)
+    db_path = os.path.join('.data', 'radio_playlist.db')
+
     # Erstelle eine Verbindung zur SQLite-Datenbank
-    conn = sqlite3.connect('radio_playlist.db')
+    conn = sqlite3.connect(db_path)
     create_tables(conn)
 
     # Parse HTML und speichere die Daten in der Datenbank
