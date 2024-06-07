@@ -43,7 +43,7 @@ def insert_or_update_data(conn, track_data):
             conductor=excluded.conductor,
             solist=excluded.solist,
             choir=excluded.choir
-        '''), track_data
+        ''', track_data)
 
 
 def parse_html(content, date_str):
