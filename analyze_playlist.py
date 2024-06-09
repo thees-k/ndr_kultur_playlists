@@ -11,8 +11,7 @@ def get_top_n_tracks(conn, n=10):
     LIMIT ?
     ''', (n,))
 
-    results = cursor.fetchall()
-    return results
+    return cursor.fetchall()
 
 
 def get_top_n_composers(conn, n=10):
@@ -63,10 +62,70 @@ def get_top_n_albums(conn, n=10):
     return cursor.fetchall()
 
 
+def get_top_n_composer_piece_combinations(conn, n=10):
+    cursor = conn.execute('''
+    SELECT composer, title, COUNT(*) as count
+    FROM Tracks
+    WHERE composer IS NOT NULL AND title IS NOT NULL
+    GROUP BY composer, title
+    ORDER BY count DESC
+    LIMIT ?
+    ''', (n,))
+    return cursor.fetchall()
+
+
+def get_top_n_orchestra_conductor_combinations(conn, n=10):
+    cursor = conn.execute('''
+    SELECT orchestra, conductor, COUNT(*) as count
+    FROM Tracks
+    WHERE orchestra IS NOT NULL AND conductor IS NOT NULL
+    GROUP BY orchestra, conductor
+    ORDER BY count DESC
+    LIMIT ?
+    ''', (n,))
+    return cursor.fetchall()
+
+
+def get_top_n_solists(conn, n=10):
+    cursor = conn.execute('''
+    SELECT solist, COUNT(*) as count
+    FROM Tracks
+    WHERE solist IS NOT NULL
+    GROUP BY solist
+    ORDER BY count DESC
+    LIMIT ?
+    ''', (n,))
+    return cursor.fetchall()
+
+
+def get_top_n_catalog_numbers(conn, n=10):
+    cursor = conn.execute('''
+    SELECT catalog_number, COUNT(*) as count
+    FROM Tracks
+    WHERE catalog_number IS NOT NULL
+    GROUP BY catalog_number
+    ORDER BY count DESC
+    LIMIT ?
+    ''', (n,))
+    return cursor.fetchall()
+
+
+def get_top_n_eans(conn, n=10):
+    cursor = conn.execute('''
+    SELECT ean, COUNT(*) as count
+    FROM Tracks
+    WHERE ean IS NOT NULL
+    GROUP BY ean
+    ORDER BY count DESC
+    LIMIT ?
+    ''', (n,))
+    return cursor.fetchall()
+
+
 def display_results(results, title):
     print(f'\n{title}\n' + '-' * len(title))
     for i, result in enumerate(results, 1):
-        if isinstance(result, tuple) and len(result) > 2:
+        if len(result) == 13:  # Normale Track-Daten
             full_title, title, movement, composer, album, catalog_number, conductor, orchestra, solist, ensemble, ean, choir, count = result
             print(f"{i}. {full_title} - {count} Mal gespielt")
             print(f"   Werk: {title}")
@@ -80,7 +139,10 @@ def display_results(results, title):
             print(f"   Ensemble: {ensemble}")
             print(f"   EAN: {ean}")
             print(f"   Chor: {choir}")
-        else:
+        elif len(result) == 3:  # Kombinationen
+            entity1, entity2, count = result
+            print(f"{i}. {entity1} & {entity2} - {count} Mal gespielt")
+        elif len(result) == 2:  # Einzelne Einheiten (z.B. Komponisten, Orchester)
             name, count = result
             print(f"{i}. {name} - {count} Mal gespielt")
 
@@ -99,7 +161,12 @@ def main():
         print("3. Die zehn am häufigsten gespielten Orchester sehen")
         print("4. Die zehn am häufigsten gespielten Dirigenten sehen")
         print("5. Die zehn am häufigsten gespielten Alben sehen")
-        print("6. Beenden")
+        print("6. Die zehn häufigsten Kombinationen aus Komponist und Werk sehen")
+        print("7. Die zehn häufigsten Kombinationen aus Orchester und Dirigent sehen")
+        print("8. Die zehn am häufigsten gespielten Solisten sehen")
+        print("9. Die zehn am häufigsten gespielten Bestellnummern sehen")
+        print("10. Die zehn am häufigsten gespielten Alben gemäß ihrer EAN")
+        print("0. Beenden")
 
         choice = input("Ihre Wahl: ")
 
@@ -119,6 +186,21 @@ def main():
             results = get_top_n_albums(conn)
             display_results(results, "Die zehn am häufigsten gespielten Alben")
         elif choice == '6':
+            results = get_top_n_composer_piece_combinations(conn)
+            display_results(results, "Die zehn häufigsten Kombinationen aus Komponist und Werk")
+        elif choice == '7':
+            results = get_top_n_orchestra_conductor_combinations(conn)
+            display_results(results, "Die zehn häufigsten Kombinationen aus Orchester und Dirigent")
+        elif choice == '8':
+            results = get_top_n_solists(conn)
+            display_results(results, "Die zehn am häufigsten gespielten Solisten")
+        elif choice == '9':
+            results = get_top_n_catalog_numbers(conn)
+            display_results(results, "Die zehn am häufigsten gespielten Bestellnummern")
+        elif choice == '10':
+            results = get_top_n_eans(conn)
+            display_results(results, "Die zehn am häufigsten gespielten Alben gemäß ihrer EAN")
+        elif choice == '0':
             break
         else:
             print("Ungültige Wahl. Bitte versuchen Sie es erneut.")
