@@ -3,30 +3,30 @@ import os
 
 
 def display_all_tracks(conn):
-    cursor = conn.execute('''
-    SELECT timestamp, title, movement, composer, full_title, image_link, album, catalog_number, orchestra, conductor, solist, choir
-    FROM Tracks
-    ORDER BY timestamp ASC
-    ''')
+    cursor = conn.execute('SELECT * FROM Tracks ORDER BY timestamp ASC')
+    results = cursor.fetchall()
 
-    tracks = cursor.fetchall()
-
-    print("\nAlle gespeicherten Tracks\n" + "-" * 25)
-    for track in tracks:
-        timestamp, title, movement, composer, full_title, image_link, album, catalog_number, orchestra, conductor, solist, choir = track
-        print(f"Zeit: {timestamp}")
-        print(f"Titel: {title}")
-        print(f"Satzbezeichnung: {movement}")
-        print(f"Komponist: {composer}")
-        print(f"Voller Titel: {full_title}")
-        print(f"Bildlink: {image_link}")
-        print(f"Album: {album}")
-        print(f"Bestellnummer: {catalog_number}")
-        print(f"Orchester/Ensemble: {orchestra}")
-        print(f"Dirigent: {conductor}")
+    for row in results:
+        (
+            id, timestamp, title, movement, composer, full_title, image_link,
+            catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir
+        ) = row
+        print(f"ID: {id}")
+        print(f"Timestamp: {timestamp}")
+        print(f"Title: {title}")
+        print(f"Movement: {movement}")
+        print(f"Composer: {composer}")
+        print(f"Full Title: {full_title}")
+        print(f"Image Link: {image_link}")
+        print(f"Catalog Number: {catalog_number}")
+        print(f"Conductor: {conductor}")
+        print(f"Orchestra: {orchestra}")
         print(f"Solist: {solist}")
-        print(f"Chor: {choir}")
-        print("\n" + "-" * 25)
+        print(f"Album: {album}")
+        print(f"Ensemble: {ensemble}")
+        print(f"EAN: {ean}")
+        print(f"Choir: {choir}")
+        print("-" * 20)
 
 
 def main():
