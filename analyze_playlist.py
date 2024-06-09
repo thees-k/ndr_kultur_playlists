@@ -4,20 +4,14 @@ import os
 
 def get_top_n_tracks(conn, n=10):
     cursor = conn.execute('''
-    SELECT full_title, title, movement, composer, album, catalog_number, orchestra, conductor, solist, choir, COUNT(id) as count
+    SELECT full_title, title, movement, composer, album, catalog_number, conductor, orchestra, solist, ensemble, ean, choir, COUNT(id) as count
     FROM Tracks
-    GROUP BY full_title, title, movement, composer, album, catalog_number, orchestra, conductor, solist, choir
+    GROUP BY full_title, title, movement, composer, album, catalog_number, conductor, orchestra, solist, ensemble, ean, choir
     ORDER BY count DESC
     LIMIT ?
     ''', (n,))
 
     results = cursor.fetchall()
-
-    # Debugging: Ergebnisse auf der Konsole ausgeben
-    print("\nDebugging: Ergebnisse der SELECT-Abfrage:")
-    for row in results:
-        print(row)
-
     return results
 
 
@@ -73,16 +67,18 @@ def display_results(results, title):
     print(f'\n{title}\n' + '-' * len(title))
     for i, result in enumerate(results, 1):
         if isinstance(result, tuple) and len(result) > 2:
-            full_title, title, movement, composer, album, catalog_number, orchestra, conductor, solist, choir, count = result
+            full_title, title, movement, composer, album, catalog_number, conductor, orchestra, solist, ensemble, ean, choir, count = result
             print(f"{i}. {full_title} - {count} Mal gespielt")
             print(f"   Werk: {title}")
             print(f"   Satzbezeichnung: {movement}")
             print(f"   Komponist: {composer}")
             print(f"   Album: {album}")
             print(f"   Bestellnummer: {catalog_number}")
-            print(f"   Orchester/Ensemble: {orchestra}")
             print(f"   Dirigent: {conductor}")
+            print(f"   Orchester: {orchestra}")
             print(f"   Solist: {solist}")
+            print(f"   Ensemble: {ensemble}")
+            print(f"   EAN: {ean}")
             print(f"   Chor: {choir}")
         else:
             name, count = result
@@ -100,7 +96,7 @@ def main():
         print("\nWählen Sie eine Option:")
         print("1. Die zehn am häufigsten gespielten Titel sehen")
         print("2. Die zehn am häufigsten gespielten Komponisten sehen")
-        print("3. Die zehn am häufigsten gespielten Orchester/Ensembles sehen")
+        print("3. Die zehn am häufigsten gespielten Orchester sehen")
         print("4. Die zehn am häufigsten gespielten Dirigenten sehen")
         print("5. Die zehn am häufigsten gespielten Alben sehen")
         print("6. Beenden")
@@ -115,7 +111,7 @@ def main():
             display_results(results, "Die zehn am häufigsten gespielten Komponisten")
         elif choice == '3':
             results = get_top_n_orchestras(conn)
-            display_results(results, "Die zehn am häufigsten gespielten Orchester/Ensembles")
+            display_results(results, "Die zehn am häufigsten gespielten Orchester")
         elif choice == '4':
             results = get_top_n_conductors(conn)
             display_results(results, "Die zehn am häufigsten gespielten Dirigenten")
