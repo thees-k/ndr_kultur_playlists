@@ -37,7 +37,8 @@ def parse_html(content, date_str, detail_counts):
 
         # Extrahiere den Bild-Link
         thumbnail_element = program.find('a', class_='zoomimage')
-        image_link = thumbnail_element['href'] if thumbnail_element and 'href' in thumbnail_element.attrs else None
+        image_link = 'https://www.ndr.de' + thumbnail_element['href'] if thumbnail_element and 'href' in thumbnail_element.attrs else None
+        print(f"Image: {image_link}")
 
         details = program.find('div', class_='wrapper')
         detail_rows = details.find_all('div', class_='details_row')
