@@ -46,9 +46,11 @@ def parse_html(content, date_str, detail_counts):
         for detail in detail_rows:
             attribute = detail.find('div', class_='details_a').text.strip()
 
-            values = [value.text.strip() for value in detail.find('div', class_='details_b').find_all('span')]
-            if values:
-                value = '; '.join(values)
+            attribute = replace_attribute_if_necessary(attribute)
+
+            unique_values = fetch_unique_values(detail)
+            if unique_values:
+                value = '; '.join(unique_values)
             else:
                 value = detail.find('div', class_='details_b').text.strip()
 
@@ -61,6 +63,28 @@ def parse_html(content, date_str, detail_counts):
 
         print()
 
+
+def replace_attribute_if_necessary(attribute):
+    if attribute == "Solisten":
+        attribute = "Solist"
+    if attribute == "Ensembles":
+        attribute = "Ensemble"
+    if attribute == "Dirigenten":
+        attribute = "Dirigent"
+    if attribute == "Chöre":
+        attribute = "Chor"
+    return attribute
+
+
+def fetch_unique_values(detail):
+    unique_values = []
+    seen_values = set()
+    for value in detail.find('div', class_='details_b').find_all('span'):
+        value_text = value.text.strip()
+        if value_text not in seen_values:
+            unique_values.append(value_text)
+            seen_values.add(value_text)
+    return unique_values
 
 
 def fetch_and_parse(url, date_str, detail_counts):
