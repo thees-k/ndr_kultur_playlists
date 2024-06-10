@@ -48,10 +48,6 @@ def display_all_tracks(conn):
     cursor = conn.execute('SELECT * FROM Tracks ORDER BY timestamp ASC')
     results = cursor.fetchall()
     for row in results:
-        (
-            id, timestamp, title, movement, composer, full_title, image_link,
-            catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir
-        ) = row
         print_row(row)
 
 
