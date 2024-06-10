@@ -128,8 +128,12 @@ def display_tracks_by_album(conn, album):
     SELECT * FROM Tracks WHERE album = ?
     ''', (album,))
     tracks = cursor.fetchall()
+    displayed_tracks = set()
     for track in tracks:
-        print(f"{format_track_info(track)}")
+        track_info = format_track_info(track)
+        if track_info not in displayed_tracks:
+            displayed_tracks.add(track_info)
+            print(track_info)
 
 
 def display_tracks_by_catalog_number(conn, catalog_number):
@@ -137,8 +141,12 @@ def display_tracks_by_catalog_number(conn, catalog_number):
     SELECT * FROM Tracks WHERE catalog_number = ?
     ''', (catalog_number,))
     tracks = cursor.fetchall()
+    displayed_tracks = set()
     for track in tracks:
-        print(f"{format_track_info(track)}")
+        track_info = format_track_info(track)
+        if track_info not in displayed_tracks:
+            displayed_tracks.add(track_info)
+            print(track_info)
 
 
 def display_tracks_by_ean(conn, ean):
@@ -146,8 +154,12 @@ def display_tracks_by_ean(conn, ean):
     SELECT * FROM Tracks WHERE ean = ?
     ''', (ean,))
     tracks = cursor.fetchall()
+    displayed_tracks = set()
     for track in tracks:
-        print(f"{format_track_info(track)}")
+        track_info = format_track_info(track)
+        if track_info not in displayed_tracks:
+            displayed_tracks.add(track_info)
+            print(track_info)
 
 
 def display_results(conn, results, title, option):
@@ -157,7 +169,7 @@ def display_results(conn, results, title, option):
             (track_id, timestamp, title, movement, composer, full_title, image_link,
              catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir, count) = result
             track = (track_id, timestamp, title, movement, composer, full_title, image_link, catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir)
-            print(f"{format_track_info(track)}")
+            print(format_track_info(track))
         elif len(result) == 3:  # Kombinationen
             entity1, entity2, count = result
             print(f"{i}. {entity1} & {entity2} - {count} Mal gespielt")
