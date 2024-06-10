@@ -1,4 +1,4 @@
-def print_track_info(track):
+def format_track_info(track):
     (track_id, timestamp, title, movement, composer, full_title, image_link,
      catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir) = track
 
@@ -22,7 +22,7 @@ def print_track_info(track):
     album_info = f"[{album_info}]" if album_info else ""
     track_info = " ".join(filter(None, [composer_info, piece_and_movement, performers, album_info]))
 
-    print(f"{timestamp}: {track_info}")
+    return track_info
 
 
 def format_field(field):

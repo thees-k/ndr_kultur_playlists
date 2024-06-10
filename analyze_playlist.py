@@ -1,16 +1,17 @@
 import sqlite3
 import os
 
+from track_formatter import format_track_info
+
 
 def get_top_n_tracks(conn, n=10):
     cursor = conn.execute('''
-    SELECT full_title, title, movement, composer, album, catalog_number, conductor, orchestra, solist, ensemble, ean, choir, COUNT(id) as count
+    SELECT *, COUNT(id) as count
     FROM Tracks
     GROUP BY full_title, title, movement, composer, album, catalog_number, conductor, orchestra, solist, ensemble, ean, choir
     ORDER BY count DESC
     LIMIT ?
     ''', (n,))
-
     return cursor.fetchall()
 
 
@@ -125,20 +126,11 @@ def get_top_n_eans(conn, n=10):
 def display_results(results, title):
     print(f'\n{title}\n' + '-' * len(title))
     for i, result in enumerate(results, 1):
-        if len(result) == 13:  # Normale Track-Daten
-            full_title, title, movement, composer, album, catalog_number, conductor, orchestra, solist, ensemble, ean, choir, count = result
-            print(f"{i}. {full_title} - {count} Mal gespielt")
-            print(f"   Werk: {title}")
-            print(f"   Satzbezeichnung: {movement}")
-            print(f"   Komponist: {composer}")
-            print(f"   Album: {album}")
-            print(f"   Bestellnummer: {catalog_number}")
-            print(f"   Dirigent: {conductor}")
-            print(f"   Orchester: {orchestra}")
-            print(f"   Solist: {solist}")
-            print(f"   Ensemble: {ensemble}")
-            print(f"   EAN: {ean}")
-            print(f"   Chor: {choir}")
+        if len(result) == 16:  # Normale Track-Daten
+            (track_id, timestamp, title, movement, composer, full_title, image_link,
+             catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir, count) = result
+            track = (track_id, timestamp, title, movement, composer, full_title, image_link, catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir)
+            print(f"{format_track_info(track)} - {count} Mal gespielt")
         elif len(result) == 3:  # Kombinationen
             entity1, entity2, count = result
             print(f"{i}. {entity1} & {entity2} - {count} Mal gespielt")

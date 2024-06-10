@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from track_formatter import print_track_info
+from track_formatter import format_track_info
 
 
 def display_all_tracks(conn):
@@ -8,7 +8,8 @@ def display_all_tracks(conn):
     cursor = conn.execute(query)
     tracks = cursor.fetchall()
     for track in tracks:
-        print_track_info(track)
+        timestamp = track[1]
+        print(f"{timestamp} {format_track_info(track)}")
 
 
 def main():
