@@ -2,65 +2,50 @@ import sqlite3
 import os
 
 
-def print_row(row):
-    (
-        id, timestamp, title, movement, composer, full_title, image_link,
-        catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir
-    ) = row
+def print_track_info(track):
+    (track_id, timestamp, title, movement, composer, full_title, image_link,
+     catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir) = track
 
-    title = format(title)
-    movement = format(movement)
-    composer = format(composer)
-    catalog_number = format(catalog_number)
-    conductor = format(conductor)
-    orchestra = format(orchestra)
-    solist = format(solist)
-    album = format(album)
-    ensemble = format(ensemble)
-    ean = format(ean)
-    choir = format(choir)
+    title = format_field(title)
+    movement = format_field(movement)
+    composer = format_field(composer)
+    catalog_number = format_field(catalog_number)
+    conductor = format_field(conductor)
+    orchestra = format_field(orchestra)
+    solist = format_field(solist)
+    album = format_field(album)
+    ensemble = format_field(ensemble)
+    ean = format_field(ean)
+    choir = format_field(choir)
 
-    composer = "" if composer == "" else composer+ ":"
-    piece_and_movement = ", ".join(format_list([title, movement]))
-    performers = ", ".join(format_list([solist, choir, ensemble, orchestra, conductor]))
-    performers = performers if performers == "" else "("+performers+")"
-    album_info = "/".join(format_list([album, ean, catalog_number]))
-    album_info = album_info if album_info == "" else "[" + album_info + "]"
-    track_info = " ".join(format_list([composer, piece_and_movement, performers, album_info]))
+    composer_info = f"{composer}:" if composer else ""
+    piece_and_movement = ", ".join(filter(None, [title, movement]))
+    performers = ", ".join(filter(None, [solist, choir, ensemble, orchestra, conductor]))
+    performers = f"({performers})" if performers else ""
+    album_info = "/".join(filter(None, [album, ean, catalog_number]))
+    album_info = f"[{album_info}]" if album_info else ""
+    track_info = " ".join(filter(None, [composer_info, piece_and_movement, performers, album_info]))
+
     print(f"{timestamp}: {track_info}")
 
 
-def format(str):
-    if not str or str == '-':
-        return ""
-    return str
-
-
-def format_list(list):
-    result = []
-    for s in list:
-        if s:
-            result.append(s)
-    return result
+def format_field(field):
+    return field if field and field != '-' else ""
 
 
 def display_all_tracks(conn):
-    cursor = conn.execute('SELECT * FROM Tracks ORDER BY timestamp ASC')
-    results = cursor.fetchall()
-    for row in results:
-        print_row(row)
+    query = 'SELECT * FROM Tracks ORDER BY timestamp ASC'
+    cursor = conn.execute(query)
+    tracks = cursor.fetchall()
+    for track in tracks:
+        print_track_info(track)
 
 
 def main():
-    # Pfad zur SQLite-Datenbank im .data-Verzeichnis
     db_path = os.path.join('.data', 'radio_playlist.db')
 
-    # Erstelle eine Verbindung zur SQLite-Datenbank
-    conn = sqlite3.connect(db_path)
-
-    display_all_tracks(conn)
-
-    conn.close()
+    with sqlite3.connect(db_path) as conn:
+        display_all_tracks(conn)
 
 
 if __name__ == '__main__':
