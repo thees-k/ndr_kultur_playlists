@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Playlist</title>
+</head>
+<body>
+    <h1>Radio Playlist</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Title</th>
+                <th>Movement</th>
+                <th>Composer</th>
+                <th>Full Title</th>
+                <th>Catalog Number</th>
+                <th>Conductor</th>
+                <th>Orchestra</th>
+                <th>Solist</th>
+                <th>Album</th>
+                <th>Ensemble</th>
+                <th>EAN</th>
+                <th>Choir</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for track in tracks %}
+                <tr>
+                    <td>{{ track.timestamp }}</td>
+                    <td>{{ track.title }}</td>
+                    <td>{{ track.movement }}</td>
+                    <td>{{ track.composer }}</td>
+                    <td>{{ track.full_title }}</td>
+                    <td>{{ track.catalog_number }}</td>
+                    <td>{{ track.conductor }}</td>
+                    <td>{{ track.orchestra }}</td>
+                    <td>{{ track.solist }}</td>
+                    <td>{{ track.album }}</td>
+                    <td>{{ track.ensemble }}</td>
+                    <td>{{ track.ean }}</td>
+                    <td>{{ track.choir }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
