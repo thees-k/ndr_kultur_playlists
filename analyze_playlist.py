@@ -16,111 +16,16 @@ def get_top_n_tracks(conn, start_date, n=10):
     return cursor.fetchall()
 
 
-def get_top_n_composers(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT composer, COUNT(*) as count
+def get_top_n_by_column(conn, column, start_date, n=10):
+    query = f'''
+    SELECT {column}, COUNT(*) as count
     FROM Tracks
-    WHERE composer IS NOT NULL AND timestamp >= ?
-    GROUP BY composer
+    WHERE {column} IS NOT NULL AND timestamp >= ?
+    GROUP BY {column}
     ORDER BY count DESC
     LIMIT ?
-    ''', (start_date, n))
-    return cursor.fetchall()
-
-
-def get_top_n_orchestras(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT orchestra, COUNT(*) as count
-    FROM Tracks
-    WHERE orchestra IS NOT NULL AND timestamp >= ?
-    GROUP BY orchestra
-    ORDER BY count DESC
-    LIMIT ?
-    ''', (start_date, n))
-    return cursor.fetchall()
-
-
-def get_top_n_conductors(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT conductor, COUNT(*) as count
-    FROM Tracks
-    WHERE conductor IS NOT NULL AND timestamp >= ?
-    GROUP BY conductor
-    ORDER BY count DESC
-    LIMIT ?
-    ''', (start_date, n))
-    return cursor.fetchall()
-
-
-def get_top_n_albums(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT album, COUNT(*) as count
-    FROM Tracks
-    WHERE album IS NOT NULL AND timestamp >= ?
-    GROUP BY album
-    ORDER BY count DESC
-    LIMIT ?
-    ''', (start_date, n))
-    return cursor.fetchall()
-
-
-def get_top_n_composer_piece_combinations(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT composer, title, COUNT(*) as count
-    FROM Tracks
-    WHERE composer IS NOT NULL AND title IS NOT NULL AND timestamp >= ?
-    GROUP BY composer, title
-    ORDER BY count DESC
-    LIMIT ?
-    ''', (start_date, n))
-    return cursor.fetchall()
-
-
-def get_top_n_orchestra_conductor_combinations(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT orchestra, conductor, COUNT(*) as count
-    FROM Tracks
-    WHERE orchestra IS NOT NULL AND conductor IS NOT NULL AND timestamp >= ?
-    GROUP BY orchestra, conductor
-    ORDER BY count DESC
-    LIMIT ?
-    ''', (start_date, n))
-    return cursor.fetchall()
-
-
-def get_top_n_solists(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT solist, COUNT(*) as count
-    FROM Tracks
-    WHERE solist IS NOT NULL AND timestamp >= ?
-    GROUP BY solist
-    ORDER BY count DESC
-    LIMIT ?
-    ''', (start_date, n))
-    return cursor.fetchall()
-
-
-def get_top_n_catalog_numbers(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT catalog_number, COUNT(*) as count
-    FROM Tracks
-    WHERE catalog_number IS NOT NULL AND timestamp >= ?
-    GROUP BY catalog_number
-    ORDER BY count DESC
-    LIMIT ?
-    ''', (start_date, n))
-    return cursor.fetchall()
-
-
-def get_top_n_eans(conn, start_date, n=10):
-    cursor = conn.execute('''
-    SELECT ean, COUNT(*) as count
-    FROM Tracks
-    WHERE ean IS NOT NULL AND timestamp >= ?
-    GROUP BY ean
-    ORDER BY count DESC
-    LIMIT ?
-    ''', (start_date, n))
+    '''
+    cursor = conn.execute(query, (start_date, n))
     return cursor.fetchall()
 
 
@@ -136,7 +41,7 @@ def calculate_dissemination(conn, column, start_date, value):
 
     for i in range(1, len(timestamps)):
         cursor = conn.execute(f"SELECT COUNT(*) FROM Tracks WHERE timestamp > ? AND timestamp < ? AND {column} != ?",
-                        (timestamps[i - 1], timestamps[i], value))
+                              (timestamps[i - 1], timestamps[i], value))
         intervening_tracks = cursor.fetchone()[0]
         total_intervening_tracks += intervening_tracks
 
@@ -144,58 +49,23 @@ def calculate_dissemination(conn, column, start_date, value):
     return dissemination
 
 
-def display_tracks_by_album(conn, album, start_date):
-    cursor = conn.execute('''
-    SELECT * FROM Tracks WHERE album = ? AND timestamp >= ?
-    ''', (album, start_date))
+def display_tracks_by_column(conn, column, value, start_date):
+    query = f'''
+    SELECT * FROM Tracks WHERE {column} = ? AND timestamp >= ?
+    '''
+    cursor = conn.execute(query, (value, start_date))
     tracks = cursor.fetchall()
     displayed_tracks = set()
 
-    print(f"Album: {album}")
+    print(f"{column.capitalize()}: {value}")
     for track in tracks:
         track_info = format_track_info(track)
         if track_info not in displayed_tracks:
             displayed_tracks.add(track_info)
             print(track_info)
 
-    dissemination = calculate_dissemination(conn, "album", start_date, album)
-    print(f"Durchschnittl. Anzahl dazwischen gespielter Titel anderer Alben: {dissemination:.2f}\n")
-
-
-def display_tracks_by_catalog_number(conn, catalog_number, start_date):
-    cursor = conn.execute('''
-    SELECT * FROM Tracks WHERE catalog_number = ? AND timestamp >= ?
-    ''', (catalog_number, start_date))
-    tracks = cursor.fetchall()
-    displayed_tracks = set()
-
-    print(f"Bestellnummer: {catalog_number}")
-    for track in tracks:
-        track_info = format_track_info(track)
-        if track_info not in displayed_tracks:
-            displayed_tracks.add(track_info)
-            print(track_info)
-
-    dissemination = calculate_dissemination(conn, "catalog_number", start_date, catalog_number)
-    print(f"Durchschnittl. Anzahl dazwischen gespielter Titel anderer Bestellnummern: {dissemination:.2f}\n")
-
-
-def display_tracks_by_ean(conn, ean, start_date):
-    cursor = conn.execute('''
-    SELECT * FROM Tracks WHERE ean = ? AND timestamp >= ?
-    ''', (ean, start_date))
-    tracks = cursor.fetchall()
-    displayed_tracks = set()
-
-    print(f"EAN: {ean}")
-    for track in tracks:
-        track_info = format_track_info(track)
-        if track_info not in displayed_tracks:
-            displayed_tracks.add(track_info)
-            print(track_info)
-
-    dissemination = calculate_dissemination(conn, "ean", start_date, ean)
-    print(f"Durchschnittl. Anzahl dazwischen gespielter Titel anderer EANs: {dissemination:.2f}\n")
+    dissemination = calculate_dissemination(conn, column, start_date, value)
+    print(f"Durchschnittl. Anzahl dazwischen gespielter Titel anderer {column.capitalize()}s: {dissemination:.2f}\n")
 
 
 def display_results(conn, results, title, option, start_date):
@@ -216,13 +86,13 @@ def display_results(conn, results, title, option, start_date):
         # Zusätzliche Anzeige der zugehörigen Tracks für Option 5, 9 und 10
         if option == 5 and len(result) == 2:
             album = result[0]
-            display_tracks_by_album(conn, album, start_date)
+            display_tracks_by_column(conn, "album", album, start_date)
         elif option == 9 and len(result) == 2:
             catalog_number = result[0]
-            display_tracks_by_catalog_number(conn, catalog_number, start_date)
+            display_tracks_by_column(conn, "catalog_number", catalog_number, start_date)
         elif option == 10 and len(result) == 2:
             ean = result[0]
-            display_tracks_by_ean(conn, ean, start_date)
+            display_tracks_by_column(conn, "ean", ean, start_date)
 
 
 def get_earliest_date(conn):
@@ -273,16 +143,16 @@ def main():
                 results = get_top_n_tracks(conn, start_date_str)
                 display_results(conn, results, "Die zehn am häufigsten gespielten Titel", 1, start_date_str)
             elif choice == '2':
-                results = get_top_n_composers(conn, start_date_str)
+                results = get_top_n_by_column(conn, "composer", start_date_str)
                 display_results(conn, results, "Die zehn am häufigsten gespielten Komponisten", 2, start_date_str)
             elif choice == '3':
-                results = get_top_n_orchestras(conn, start_date_str)
+                results = get_top_n_by_column(conn, "orchestra", start_date_str)
                 display_results(conn, results, "Die zehn am häufigsten gespielten Orchester", 3, start_date_str)
             elif choice == '4':
-                results = get_top_n_conductors(conn, start_date_str)
+                results = get_top_n_by_column(conn, "conductor", start_date_str)
                 display_results(conn, results, "Die zehn am häufigsten gespielten Dirigenten", 4, start_date_str)
             elif choice == '5':
-                results = get_top_n_albums(conn, start_date_str)
+                results = get_top_n_by_column(conn, "album", start_date_str)
                 display_results(conn, results, "Die zehn am häufigsten gespielten Alben", 5, start_date_str)
             elif choice == '6':
                 results = get_top_n_composer_piece_combinations(conn, start_date_str)
@@ -291,13 +161,13 @@ def main():
                 results = get_top_n_orchestra_conductor_combinations(conn, start_date_str)
                 display_results(conn, results, "Die zehn häufigsten Kombinationen aus Orchester und Dirigent", 7, start_date_str)
             elif choice == '8':
-                results = get_top_n_solists(conn, start_date_str)
+                results = get_top_n_by_column(conn, "solist", start_date_str)
                 display_results(conn, results, "Die zehn am häufigsten gespielten Solisten", 8, start_date_str)
             elif choice == '9':
-                results = get_top_n_catalog_numbers(conn, start_date_str)
+                results = get_top_n_by_column(conn, "catalog_number", start_date_str)
                 display_results(conn, results, "Die zehn am häufigsten gespielten Bestellnummern", 9, start_date_str)
             elif choice == '10':
-                results = get_top_n_eans(conn, start_date_str)
+                results = get_top_n_by_column(conn, "ean", start_date_str)
                 display_results(conn, results, "Die zehn am häufigsten gespielten Alben gemäß ihrer EAN", 10, start_date_str)
             elif choice == '0':
                 break
