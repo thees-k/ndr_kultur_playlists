@@ -29,6 +29,30 @@ def get_top_n_by_column(conn, column, start_date, n=10):
     return cursor.fetchall()
 
 
+def get_top_n_composer_piece_combinations(conn, start_date, n=10):
+    cursor = conn.execute('''
+    SELECT composer, title, COUNT(*) as count
+    FROM Tracks
+    WHERE composer IS NOT NULL AND title IS NOT NULL AND timestamp >= ?
+    GROUP BY composer, title
+    ORDER BY count DESC
+    LIMIT ?
+    ''', (start_date, n))
+    return cursor.fetchall()
+
+
+def get_top_n_orchestra_conductor_combinations(conn, start_date, n=10):
+    cursor = conn.execute('''
+    SELECT orchestra, conductor, COUNT(*) as count
+    FROM Tracks
+    WHERE orchestra IS NOT NULL AND conductor IS NOT NULL AND timestamp >= ?
+    GROUP BY orchestra, conductor
+    ORDER BY count DESC
+    LIMIT ?
+    ''', (start_date, n))
+    return cursor.fetchall()
+
+
 def calculate_dissemination(conn, column, start_date, value):
     cursor = conn.execute(f"SELECT timestamp FROM Tracks WHERE {column} = ? AND timestamp >= ? ORDER BY timestamp",
                           (value, start_date))
@@ -45,7 +69,7 @@ def calculate_dissemination(conn, column, start_date, value):
         intervening_tracks = cursor.fetchone()[0]
         total_intervening_tracks += intervening_tracks
 
-    dissemination = total_intervening_tracks / (len(timestamps) - 1)
+    dissemination = total_intervening_tracks / (len(t.timestamps) - 1)
     return dissemination
 
 
