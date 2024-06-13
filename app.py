@@ -12,9 +12,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-class Track(db.Model):
+class Tracks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.String, unique=True)
+    timestamp = db.Column(db.String)
     title = db.Column(db.String)
     movement = db.Column(db.String)
     composer = db.Column(db.String)
@@ -32,7 +32,7 @@ class Track(db.Model):
 
 @app.route('/')
 def index():
-    tracks = Track.query.all()
+    tracks = Tracks.query.all()
     return render_template('index.html', tracks=tracks)
 
 
@@ -43,5 +43,26 @@ if __name__ == '__main__':
     # Initialisieren der Datenbank
     with app.app_context():
         db.create_all()
+
+        # Testdaten hinzufügen, wenn die Tabelle leer ist
+        if Tracks.query.count() == 0:
+            test_track = Tracks(
+                timestamp='2024-06-13 12:00',
+                title='Test Title',
+                movement='Test Movement',
+                composer='Test Composer',
+                full_title='Test Full Title',
+                image_link='http://example.com/image.jpg',
+                catalog_number='12345',
+                conductor='Test Conductor',
+                orchestra='Test Orchestra',
+                solist='Test Solist',
+                album='Test Album',
+                ensemble='Test Ensemble',
+                ean='67890',
+                choir='Test Choir'
+            )
+            db.session.add(test_track)
+            db.session.commit()
 
     app.run(debug=True)
