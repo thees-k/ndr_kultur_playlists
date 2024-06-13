@@ -2,6 +2,9 @@ def format_track_info(track):
     (track_id, timestamp, title, movement, composer, full_title, image_link,
      catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir) = track
 
+    if orchestra == ensemble:
+        ensemble = ""
+
     title = format_field(title)
     movement = format_field(movement)
     composer = format_field(composer)
