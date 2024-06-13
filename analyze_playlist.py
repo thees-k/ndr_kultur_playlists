@@ -124,17 +124,44 @@ def get_top_n_eans(conn, start_date, n=10):
     return cursor.fetchall()
 
 
+def calculate_dissemination(conn, album, start_date):
+    cursor = conn.execute('''
+    SELECT timestamp FROM Tracks WHERE album = ? AND timestamp >= ? ORDER BY timestamp
+    ''', (album, start_date))
+    timestamps = [row[0] for row in cursor.fetchall()]
+
+    if len(timestamps) < 2:
+        return 0.0
+
+    total_intervening_tracks = 0
+
+    for i in range(1, len(timestamps)):
+        cursor = conn.execute('''
+        SELECT COUNT(*) FROM Tracks WHERE timestamp > ? AND timestamp < ? AND album != ?
+        ''', (timestamps[i - 1], timestamps[i], album))
+        intervening_tracks = cursor.fetchone()[0]
+        total_intervening_tracks += intervening_tracks
+
+    dissemination = total_intervening_tracks / (len(timestamps) - 1)
+    return dissemination
+
+
 def display_tracks_by_album(conn, album, start_date):
     cursor = conn.execute('''
     SELECT * FROM Tracks WHERE album = ? AND timestamp >= ?
     ''', (album, start_date))
     tracks = cursor.fetchall()
     displayed_tracks = set()
+
+    print(f"Album: {album}")
     for track in tracks:
         track_info = format_track_info(track)
         if track_info not in displayed_tracks:
             displayed_tracks.add(track_info)
             print(track_info)
+
+    dissemination = calculate_dissemination(conn, album, start_date)
+    print(f"Durchschnittl. Anzahl dazwischen gespielter Titel anderer Alben: {dissemination:.2f}\n")
 
 
 def display_tracks_by_catalog_number(conn, catalog_number, start_date):
@@ -170,7 +197,7 @@ def display_results(conn, results, title, option, start_date):
             (track_id, timestamp, title, movement, composer, full_title, image_link,
              catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir, count) = result
             track = (track_id, timestamp, title, movement, composer, full_title, image_link, catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir)
-            print(f"{format_track_info(track)} - {count} Mal gespielt")
+            print(format_track_info(track))
         elif len(result) == 3:  # Kombinationen
             entity1, entity2, count = result
             print(f"{i}. {entity1} & {entity2} - {count} Mal gespielt")
