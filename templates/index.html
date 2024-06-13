@@ -19,12 +19,31 @@
         th {
             background-color: #f2f2f2;
         }
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
     <h1>Radio Playlist</h1>
     <table>
         <thead>
+            <tr>
+                <th><input type="text" id="timestampFilter" onkeyup="filterTable('timestampFilter', 0)" placeholder="Search for timestamps"></th>
+                <th><input type="text" id="titleFilter" onkeyup="filterTable('titleFilter', 1)" placeholder="Search for titles"></th>
+                <th><input type="text" id="movementFilter" onkeyup="filterTable('movementFilter', 2)" placeholder="Search for movements"></th>
+                <th><input type="text" id="composerFilter" onkeyup="filterTable('composerFilter', 3)" placeholder="Search for composers"></th>
+                <th><input type="text" id="fullTitleFilter" onkeyup="filterTable('fullTitleFilter', 4)" placeholder="Search for full titles"></th>
+                <th><input type="text" id="catalogNumberFilter" onkeyup="filterTable('catalogNumberFilter', 5)" placeholder="Search for catalog numbers"></th>
+                <th><input type="text" id="conductorFilter" onkeyup="filterTable('conductorFilter', 6)" placeholder="Search for conductors"></th>
+                <th><input type="text" id="orchestraFilter" onkeyup="filterTable('orchestraFilter', 7)" placeholder="Search for orchestras"></th>
+                <th><input type="text" id="solistFilter" onkeyup="filterTable('solistFilter', 8)" placeholder="Search for solists"></th>
+                <th><input type="text" id="albumFilter" onkeyup="filterTable('albumFilter', 9)" placeholder="Search for albums"></th>
+                <th><input type="text" id="ensembleFilter" onkeyup="filterTable('ensembleFilter', 10)" placeholder="Search for ensembles"></th>
+                <th><input type="text" id="eanFilter" onkeyup="filterTable('eanFilter', 11)" placeholder="Search for EANs"></th>
+                <th><input type="text" id="choirFilter" onkeyup="filterTable('choirFilter', 12)" placeholder="Search for choirs"></th>
+            </tr>
             <tr>
                 <th>Timestamp</th>
                 <th>Title</th>
@@ -61,5 +80,27 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <script>
+        function filterTable(inputId, colIndex) {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById(inputId);
+            filter = input.value.toUpperCase();
+            table = document.querySelector("table");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 2; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[colIndex];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>
