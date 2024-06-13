@@ -2,9 +2,6 @@ def format_track_info(track):
     (track_id, timestamp, title, movement, composer, full_title, image_link,
      catalog_number, conductor, orchestra, solist, album, ensemble, ean, choir) = track
 
-    if orchestra == ensemble:
-        ensemble = ""
-
     title = format_field(title)
     movement = format_field(movement)
     composer = format_field(composer)
@@ -17,9 +14,17 @@ def format_track_info(track):
     ean = format_field(ean)
     choir = format_field(choir)
 
+    perf = []
+    if choir:
+        perf.append(choir)
+    if ensemble and ensemble not in perf:
+        perf.append(ensemble)
+    if orchestra and orchestra not in perf:
+        perf.append(orchestra)
+
     composer_info = f"{composer}:" if composer else ""
     piece_and_movement = ", ".join(filter(None, [title, movement]))
-    performers = ", ".join(filter(None, [solist, choir, ensemble, orchestra, conductor]))
+    performers = ", ".join(filter(None, [solist, *perf, conductor]))
     performers = f"({performers})" if performers else ""
     album_info = "/".join(filter(None, [album, ean, catalog_number]))
     album_info = f"[{album_info}]" if album_info else ""
@@ -29,4 +34,4 @@ def format_track_info(track):
 
 
 def format_field(field):
-    return field if field and field != '-' else ""
+    return field.strip() if field and field.strip() != '-' and field.strip() != 'o. A.' else ""
