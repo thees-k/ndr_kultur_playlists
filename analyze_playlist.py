@@ -124,10 +124,9 @@ def get_top_n_eans(conn, start_date, n=10):
     return cursor.fetchall()
 
 
-def calculate_dissemination(conn, album, start_date):
-    cursor = conn.execute('''
-    SELECT timestamp FROM Tracks WHERE album = ? AND timestamp >= ? ORDER BY timestamp
-    ''', (album, start_date))
+def calculate_dissemination(conn, column, start_date, value):
+    cursor = conn.execute(f"SELECT timestamp FROM Tracks WHERE {column} = ? AND timestamp >= ? ORDER BY timestamp",
+                          (value, start_date))
     timestamps = [row[0] for row in cursor.fetchall()]
 
     if len(timestamps) < 2:
@@ -136,9 +135,8 @@ def calculate_dissemination(conn, album, start_date):
     total_intervening_tracks = 0
 
     for i in range(1, len(timestamps)):
-        cursor = conn.execute('''
-        SELECT COUNT(*) FROM Tracks WHERE timestamp > ? AND timestamp < ? AND album != ?
-        ''', (timestamps[i - 1], timestamps[i], album))
+        cursor = conn.execute(f"SELECT COUNT(*) FROM Tracks WHERE timestamp > ? AND timestamp < ? AND {column} != ?",
+                        (timestamps[i - 1], timestamps[i], value))
         intervening_tracks = cursor.fetchone()[0]
         total_intervening_tracks += intervening_tracks
 
@@ -160,7 +158,7 @@ def display_tracks_by_album(conn, album, start_date):
             displayed_tracks.add(track_info)
             print(track_info)
 
-    dissemination = calculate_dissemination(conn, album, start_date)
+    dissemination = calculate_dissemination(conn, "album", start_date, album)
     print(f"Durchschnittl. Anzahl dazwischen gespielter Titel anderer Alben: {dissemination:.2f}\n")
 
 
@@ -170,11 +168,16 @@ def display_tracks_by_catalog_number(conn, catalog_number, start_date):
     ''', (catalog_number, start_date))
     tracks = cursor.fetchall()
     displayed_tracks = set()
+
+    print(f"Bestellnummer: {catalog_number}")
     for track in tracks:
         track_info = format_track_info(track)
         if track_info not in displayed_tracks:
             displayed_tracks.add(track_info)
             print(track_info)
+
+    dissemination = calculate_dissemination(conn, "catalog_number", start_date, catalog_number)
+    print(f"Durchschnittl. Anzahl dazwischen gespielter Titel anderer Bestellnummern: {dissemination:.2f}\n")
 
 
 def display_tracks_by_ean(conn, ean, start_date):
@@ -183,11 +186,16 @@ def display_tracks_by_ean(conn, ean, start_date):
     ''', (ean, start_date))
     tracks = cursor.fetchall()
     displayed_tracks = set()
+
+    print(f"EAN: {ean}")
     for track in tracks:
         track_info = format_track_info(track)
         if track_info not in displayed_tracks:
             displayed_tracks.add(track_info)
             print(track_info)
+
+    dissemination = calculate_dissemination(conn, "ean", start_date, ean)
+    print(f"Durchschnittl. Anzahl dazwischen gespielter Titel anderer EANs: {dissemination:.2f}\n")
 
 
 def display_results(conn, results, title, option, start_date):
