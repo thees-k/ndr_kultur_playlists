@@ -30,8 +30,7 @@ class Tracks(db.Model):
 
 @app.route('/')
 def index():
-    tracks = Tracks.query.all()
-    return render_template('index.html', tracks=tracks)
+    return render_template('index.html')
 
 @app.route('/data')
 def data():
@@ -52,8 +51,7 @@ def data():
         'ean': track.ean,
         'choir': track.choir
     } for track in tracks]
-    rj = jsonify(track_list)
-    return rj
+    return jsonify({"data": track_list})
 
 if __name__ == '__main__':
     # Sicherstellen, dass das .data-Verzeichnis existiert

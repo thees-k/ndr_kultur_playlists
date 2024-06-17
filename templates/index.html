@@ -37,7 +37,10 @@
             $('#trackTable').DataTable({
                 "processing": true,
                 "serverSide": false,
-                "ajax": "/data",
+                "ajax": {
+                    "url": "/data",
+                    "type": "GET"
+                },
                 "columns": [
                     {"data": "timestamp"},
                     {"data": "title"},
