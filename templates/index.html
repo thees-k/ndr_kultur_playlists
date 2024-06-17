@@ -2,115 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Playlist</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        input[type="text"] {
-            width: 100%;
-            box-sizing: border-box;
-        }
-    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
 </head>
 <body>
-    <h1>Radio Playlist</h1>
-
-    <button onclick="location.href='/top_tracks'">Top 10 Tracks</button>
-    <button onclick="location.href='/top_composers'">Top 10 Composers</button>
-    <button onclick="location.href='/top_orchestras'">Top 10 Orchestras</button>
-    <button onclick="location.href='/top_conductors'">Top 10 Conductors</button>
-    <button onclick="location.href='/top_albums'">Top 10 Albums</button>
-    <button onclick="location.href='/top_solists'">Top 10 Solists</button>
-    <button onclick="location.href='/top_catalog_numbers'">Top 10 Catalog Numbers</button>
-    <button onclick="location.href='/top_eans'">Top 10 EANs</button>
-
-    <table>
-        <thead>
-            <tr>
-                <th><input type="text" id="timestampFilter" onkeyup="filterTable('timestampFilter', 0)" placeholder="Search for timestamps"></th>
-                <th><input type="text" id="titleFilter" onkeyup="filterTable('titleFilter', 1)" placeholder="Search for titles"></th>
-                <th><input type="text" id="movementFilter" onkeyup="filterTable('movementFilter', 2)" placeholder="Search for movements"></th>
-                <th><input type="text" id="composerFilter" onkeyup="filterTable('composerFilter', 3)" placeholder="Search for composers"></th>
-                <th><input type="text" id="fullTitleFilter" onkeyup="filterTable('fullTitleFilter', 4)" placeholder="Search for full titles"></th>
-                <th><input type="text" id="catalogNumberFilter" onkeyup="filterTable('catalogNumberFilter', 5)" placeholder="Search for catalog numbers"></th>
-                <th><input type="text" id="conductorFilter" onkeyup="filterTable('conductorFilter', 6)" placeholder="Search for conductors"></th>
-                <th><input type="text" id="orchestraFilter" onkeyup="filterTable('orchestraFilter', 7)" placeholder="Search for orchestras"></th>
-                <th><input type="text" id="solistFilter" onkeyup="filterTable('solistFilter', 8)" placeholder="Search for solists"></th>
-                <th><input type="text" id="albumFilter" onkeyup="filterTable('albumFilter', 9)" placeholder="Search for albums"></th>
-                <th><input type="text" id="ensembleFilter" onkeyup="filterTable('ensembleFilter', 10)" placeholder="Search for ensembles"></th>
-                <th><input type="text" id="eanFilter" onkeyup="filterTable('eanFilter', 11)" placeholder="Search for EANs"></th>
-                <th><input type="text" id="choirFilter" onkeyup="filterTable('choirFilter', 12)" placeholder="Search for choirs"></th>
-            </tr>
-            <tr>
-                <th>Timestamp</th>
-                <th>Title</th>
-                <th>Movement</th>
-                <th>Composer</th>
-                <th>Full Title</th>
-                <th>Catalog Number</th>
-                <th>Conductor</th>
-                <th>Orchestra</th>
-                <th>Solist</th>
-                <th>Album</th>
-                <th>Ensemble</th>
-                <th>EAN</th>
-                <th>Choir</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for track in tracks %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Radio Playlist</h1>
+        <table id="trackTable" class="display">
+            <thead>
                 <tr>
-                    <td>{{ track.timestamp }}</td>
-                    <td>{{ track.title }}</td>
-                    <td>{{ track.movement }}</td>
-                    <td>{{ track.composer }}</td>
-                    <td>{{ track.full_title }}</td>
-                    <td>{{ track.catalog_number }}</td>
-                    <td>{{ track.conductor }}</td>
-                    <td>{{ track.orchestra }}</td>
-                    <td>{{ track.solist }}</td>
-                    <td>{{ track.album }}</td>
-                    <td>{{ track.ensemble }}</td>
-                    <td>{{ track.ean }}</td>
-                    <td>{{ track.choir }}</td>
+                    <th>Timestamp</th>
+                    <th>Title</th>
+                    <th>Movement</th>
+                    <th>Composer</th>
+                    <th>Full Title</th>
+                    <th>Image Link</th>
+                    <th>Catalog Number</th>
+                    <th>Conductor</th>
+                    <th>Orchestra</th>
+                    <th>Solist</th>
+                    <th>Album</th>
+                    <th>Ensemble</th>
+                    <th>EAN</th>
+                    <th>Choir</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+            </thead>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <script>
-        function filterTable(inputId, colIndex) {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById(inputId);
-            filter = input.value.toUpperCase();
-            table = document.querySelector("table");
-            tr = table.getElementsByTagName("tr");
-
-            for (i = 2; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[colIndex];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        }
+        $(document).ready(function() {
+            $('#trackTable').DataTable({
+                "processing": true,
+                "serverSide": false,
+                "ajax": "/data",
+                "columns": [
+                    {"data": "timestamp"},
+                    {"data": "title"},
+                    {"data": "movement"},
+                    {"data": "composer"},
+                    {"data": "full_title"},
+                    {"data": "image_link"},
+                    {"data": "catalog_number"},
+                    {"data": "conductor"},
+                    {"data": "orchestra"},
+                    {"data": "solist"},
+                    {"data": "album"},
+                    {"data": "ensemble"},
+                    {"data": "ean"},
+                    {"data": "choir"}
+                ]
+            });
+        });
     </script>
 </body>
 </html>
