@@ -1,4 +1,3 @@
-# ndr_kultur_playlists
 <h1>NDR Kultur Playlists Analyzer</h1>
 
 <p>
