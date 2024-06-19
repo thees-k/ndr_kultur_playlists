@@ -183,11 +183,11 @@ def main():
 
     base_url = 'https://www.ndr.de/kultur/programm/titelliste1212.html'
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=60)
+    start_date = end_date - timedelta(days=6)
 
-    # Sicherstellen, dass das .data-Verzeichnis existiert
-    os.makedirs('.data', exist_ok=True)
-    db_path = os.path.join('.data', 'radio_playlist.db')
+    # Sicherstellen, dass das data-Verzeichnis existiert
+    os.makedirs('data', exist_ok=True)
+    db_path = os.path.join('data', 'radio_playlist.db')
 
     # Erstelle eine Verbindung zur SQLite-Datenbank
     conn = sqlite3.connect(db_path)

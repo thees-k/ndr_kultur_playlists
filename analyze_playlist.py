@@ -128,7 +128,7 @@ def get_earliest_date(conn):
 
 
 def main():
-    db_path = os.path.join('.data', 'radio_playlist.db')
+    db_path = os.path.join('data', 'radio_playlist.db')
 
     with sqlite3.connect(db_path) as conn:
         earliest_date_str = get_earliest_date(conn)

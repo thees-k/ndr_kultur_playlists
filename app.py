@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Konfiguration der SQLite-Datenbank
-db_path = os.path.join(os.path.dirname(__file__), '.data', 'radio_playlist.db')
+db_path = os.path.join(os.path.dirname(__file__), 'data', 'radio_playlist.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -54,8 +54,8 @@ def data():
     return jsonify({"data": track_list})
 
 if __name__ == '__main__':
-    # Sicherstellen, dass das .data-Verzeichnis existiert
-    os.makedirs(os.path.join(os.path.dirname(__file__), '.data'), exist_ok=True)
+    # Sicherstellen, dass das data-Verzeichnis existiert
+    os.makedirs(os.path.join(os.path.dirname(__file__), 'data'), exist_ok=True)
 
     # Initialisieren der Datenbank
     with app.app_context():

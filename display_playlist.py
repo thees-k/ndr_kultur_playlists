@@ -13,7 +13,7 @@ def display_all_tracks(conn):
 
 
 def main():
-    db_path = os.path.join('.data', 'radio_playlist.db')
+    db_path = os.path.join('data', 'radio_playlist.db')
 
     with sqlite3.connect(db_path) as conn:
         display_all_tracks(conn)
