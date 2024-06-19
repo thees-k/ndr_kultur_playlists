@@ -1,4 +1,3 @@
-<h1>NDR Kultur Playlists Analyzer</h1>
 
 <p>
 <a href="./templates/index.html">NDR Kultur - gespielte Titel in einer Tabelle</a>  
