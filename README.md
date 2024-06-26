@@ -8,7 +8,7 @@ This project allows for the analysis of the tracks played by the radio station N
 
 - **Playlist Collection**: Automatically collect and store playlists from the NDR Kultur radio station for the past two months.
 - **Database**: Store the collected data in a SQLite database.
-- **Web Interface**: Searchable table of stored tracks with various analysis options.
+- **Web Interface**: Searchable table of stored tracks.
 - **Analysis Functions**: Display the top ten most frequently played tracks, composers, orchestras, conductors, albums, soloists, catalog numbers, and combinations.
 
 ## Installation
