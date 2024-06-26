@@ -105,5 +105,13 @@ Contributions to this project are welcome. Please open an issue to report bugs o
 ## License
 
 This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+
+### Third-Party Licenses
+
+This project includes third-party libraries that are distributed under their own licenses:
+
+- [Bootstrap](https://getbootstrap.com/) is licensed under the MIT License.
+- [jQuery](https://jquery.com/) is licensed under the MIT License.
+- [DataTables](https://datatables.net/) is licensed under the MIT License.
 ```
 
