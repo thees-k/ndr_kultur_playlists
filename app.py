@@ -11,6 +11,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+
 class Tracks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.String, unique=True)
@@ -28,9 +29,11 @@ class Tracks(db.Model):
     ean = db.Column(db.String, nullable=True)
     choir = db.Column(db.String, nullable=True)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/data')
 def data():
@@ -52,6 +55,7 @@ def data():
         'choir': track.choir
     } for track in tracks]
     return jsonify({"data": track_list})
+
 
 if __name__ == '__main__':
     # Sicherstellen, dass das data-Verzeichnis existiert
