@@ -69,7 +69,7 @@ def calculate_dissemination(conn, column, start_date, value):
         intervening_tracks = cursor.fetchone()[0]
         total_intervening_tracks += intervening_tracks
 
-    dissemination = total_intervening_tracks / (len(t.timestamps) - 1)
+    dissemination = total_intervening_tracks / (len(timestamps) - 1)
     return dissemination
 
 
