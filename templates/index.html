@@ -5,11 +5,16 @@
     <title>Radio Playlist</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <style>
+        .datatable img {
+            max-width: 100px; /* You can adjust the size of the images as required */
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Radio Playlist</h1>
-        <table id="trackTable" class="display">
+        <table id="trackTable" class="display datatable">
             <thead>
                 <tr>
                     <th>Timestamp</th>
@@ -17,7 +22,7 @@
                     <th>Movement</th>
                     <th>Composer</th>
                     <th>Full Title</th>
-                    <th>Image Link</th>
+                    <th>Image</th>
                     <th>Catalog Number</th>
                     <th>Conductor</th>
                     <th>Orchestra</th>
@@ -47,7 +52,9 @@
                     {"data": "movement"},
                     {"data": "composer"},
                     {"data": "full_title"},
-                    {"data": "image_link"},
+                    {"data": "image_link", "render": function(data, type, row) {
+                        return '<a href="' + data + '"> <img src="' + data + '" alt="Cover"> </a>';
+                    }},
                     {"data": "catalog_number"},
                     {"data": "conductor"},
                     {"data": "orchestra"},
