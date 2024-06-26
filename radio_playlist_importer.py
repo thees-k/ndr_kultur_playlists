@@ -183,7 +183,7 @@ def main():
 
     base_url = 'https://www.ndr.de/kultur/programm/titelliste1212.html'
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=6)
+    start_date = end_date - timedelta(days=60)
 
     # Sicherstellen, dass das data-Verzeichnis existiert
     os.makedirs('data', exist_ok=True)
