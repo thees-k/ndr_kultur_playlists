@@ -76,6 +76,8 @@ This project allows for the analysis of the tracks played by the radio station N
 
 The web interface allows browsing and analyzing the stored playlists. The table shows the stored tracks and allows filtering the results by various columns.
 
+![Screenshot](/Screenshot.jpg)
+
 
 ### Analysis Script
 
