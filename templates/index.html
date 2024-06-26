@@ -53,7 +53,8 @@
                     {"data": "composer"},
                     {"data": "full_title"},
                     {"data": "image_link", "render": function(data, type, row) {
-                        return '<a href="' + data + '"> <img src="' + data + '" alt="Cover"> </a>';
+                        var largeImageLink = data.replace('_300x300.jpg', '_600x600.jpg');
+                        return '<a href="' + largeImageLink + '"> <img src="' + largeImageLink + '" alt="Cover"> </a>';
                     }},
                     {"data": "catalog_number"},
                     {"data": "conductor"},
