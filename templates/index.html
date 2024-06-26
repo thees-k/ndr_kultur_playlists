@@ -55,7 +55,7 @@
                     {"data": "image_link", "render": function(data, type, row) {
                         if (data) {
                             var largeImageLink = data.replace('_300x300.jpg', '_600x600.jpg');
-                            return '<a href="' + largeImageLink + '"> <img src="' + largeImageLink + '" alt="Cover"> </a>';
+                            return '<a href="' + largeImageLink + '"> <img src="' + data + '" alt="Cover"> </a>';
                         } else {
                             return '';
                         }
